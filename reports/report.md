@@ -25,9 +25,9 @@ We created a simple `malloc()` bomb which worked by calling `malloc()` in a loop
 - Navigating to /sys/fs/cgroup/memory. Within this directory, we run the following instructions (will almost certainly require sudo):
     * `cgcreate -g memory:/GROUP_NAME`
         - This creates a control group with the name GROUP_NAME as a subdirectory of memory.
-    * `cgset -r memory.limit_in_bytes=MEM_LIMIT`
-        - This limits the memory usage of all processes run under the control group to MEM_LIMIT. Shorthand like 128m is allowed.
-    * `echo PID > cgroup.procs`
+    * `cgset -r memory.limit_in_bytes=MEM_LIMIT GROUP_NAME`
+        - This limits the memory usage of all processes run under the control group GROUP_NAME to MEM_LIMIT. Shorthand like 128m is allowed.
+    * `echo PID > ./GROUP_NAME/cgroup.procs`
         - This limits all processes with the process ID PID (and all subprocesses).
 Using sudo -i to spawn a sudo shell is probably the most convenient way to do it, but bear in mind it’s a new process and has a new PID. 
 The malloc() bomb will now be killed once its memory usage exceeds 128m.
