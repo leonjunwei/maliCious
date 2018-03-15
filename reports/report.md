@@ -5,7 +5,7 @@
 
 We planned to research and implement exploits written in C that would have negative effects when run.
 
-####Learning Goals
+#### Learning Goals
 
 We hoped to learn more about how (and why) different exploits work and also investigate countermeasures. At a deeper level, we wanted to learn more about the underpinnings of both C and Linux by exploring their weaknesses.
 
