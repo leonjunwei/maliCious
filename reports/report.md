@@ -32,7 +32,7 @@ We created a simple `malloc()` bomb which worked by calling `malloc()` in a loop
           Using sudo -i to spawn a sudo shell is probably the most convenient way to do it, but bear in mind it’s a new process and has a new PID. 
           The malloc() bomb will now be killed once its memory usage exceeds 128m.
 
-![example of killed malloc() bomb](pictures/malloc_killed.PNG)
+![example of killed malloc() bomb](https://github.com/leonjunwei/maliCious/blob/master/pictures/malloc_killed.PNG)
 ​    
 
 We also attempted to use buffer overflows to execute arbitrary code. Many C programmers do not implement bounds checking when writing data. We used [vuln.c](https://github.com/leonjunwei/maliCious/blob/master/vuln.c) as a simplified example for testing:
@@ -46,7 +46,7 @@ void main(int argc, char argv, char envp) {
 
 vuln.c takes in a string and attempts to store it in a stack-allocated buffer. If you were to give it a string of 1000 “A”’s, it would simply write past the end of the stack frame, and very likely give a segmentation fault error:
 
-![Buffer overwrite resulting in seg fault](pictures/seg_fault.PNG)
+![Buffer overwrite resulting in seg fault](https://github.com/leonjunwei/maliCious/blob/master/pictures/seg_fault.png)
 
 Unfortunately, that’s not a very useful exploit; there are plenty of ways to crash a process. A more powerful exploit involves carefully choosing the input string. When a function is called, it’s given a pointer to the place in code where it was called from. This can be thought of as the return address of the function. By crafting a string that overwrites this return address with a different address, it is possible to hijack the program into running arbitrary code.
 
@@ -55,7 +55,7 @@ Our primary source, “Smashing the Stack for Fun and Profit,” illustrates one
 We experimented a number of different exploit files, but they all work on the same concept: they create a shell script of a user-input length (padded with NOP commands) and save it to an environment variable called EGG. Theoretically, passing EGG as input to a vulnerable program will overflow a buffer. If EGG is the correct length, we then overwrite the return address of that stack frame and point back toward our shell script, which executes arbitrary code.
 
 This principle did not work so cleanly when we went to implement it. We were unable to get `vuln.c` to spawn a shell we could use: generating a shell script above a certain length (around 950) resulted in a segmentation fault while a shell script below that length failed silently. 
-![too long](pictures/shellcode_too_long.PNG) ![too short](pictures/shellcode_too_short.PNG)
+![too long](https://github.com/leonjunwei/maliCious/blob/master/pictures/shellcode_too_long.PNG) ![too short](https://github.com/leonjunwei/maliCious/blob/master/pictures/shellcode_too_short.PNG)
 
 We did a little research and it turns out modern computers are pretty well-equipped to deal with these sorts of things. Many operating systems nowadays use Address Space Layout Randomization (ASLR) to put address space targets in random locations, which might make it more difficult for us to access the parts of memory we want. In addition, gcc has a bunch of built-in stack protections when it comes to using unsafe methods (like strcpy) to prevent such attacks.
 
