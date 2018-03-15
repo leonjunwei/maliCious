@@ -20,6 +20,19 @@ We searched through a number of papers and tutorials from the late nineties/earl
 
 #### Results
 
+We created a simple malloc() bomb which worked by calling malloc() in a loop, allocating all available memory and crashing our VM. We successfully implemented memory-limiting with cgroups by:
+- Installing cgroup-bin or cgroup tools (I used cgroup-bin)
+- Navigating to /sys/fs/cgroup/memory. Within this directory, we run the following instructions (will almost certainly require sudo):
+    * cgcreate -g memory:/GROUP_NAME
+        - This creates a control group with the name GROUP_NAME as a subdirectory of memory.
+    * cgset -r memory.limit_in_bytes=MEM_LIMIT
+        - This limits the memory usage of all processes run under the control group to MEM_LIMIT. Shorthand like 128m is allowed.
+    * echo PID > cgroup.procs
+        - This limits all processes with the process ID PID (and all subprocesses).
+Using sudo -i to spawn a sudo shell is probably the most convenient way to do it, but bear in mind it’s a new process and has a new PID. 
+The malloc() bomb will now be killed once its memory usage exceeds 128m.
+    
+
 We also attempted to use buffer overflows to execute arbitrary code. Many C programmers do not implement bounds checking when writing data. We used [vuln.c](https://github.com/leonjunwei/maliCious/blob/master/vuln.c) as a simplified example for testing:
 
 ```c
