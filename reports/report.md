@@ -50,7 +50,15 @@ vuln.c takes in a string and attempts to store it in a stack-allocated buffer. I
 
 Unfortunately, that’s not a very useful exploit; there are plenty of ways to crash a process. A more powerful exploit involves carefully choosing the input string. When a function is called, it’s given a pointer to the place in code where it was called from. This can be thought of as the return address of the function. By crafting a string that overwrites this return address with a different address, it is possible to hijack the program into running arbitrary code.
 
-Our primary source, “Smashing the Stack for Fun and Profit,” illustrates one way to do this. The gist of the method is to include the assembly code you want to execute, in this case the command to spawn a shell, in the string you use to overflow the buffer. You then overwrite the return address of the stack frame with the address of the buffer itself. The entire elegant exploit is contained within the string. The article also explains ways to improve our chances of actually executing the code, such as padding the string with NOP commands.
+Our primary source, “Smashing the Stack for Fun and Profit,” illustrates one way to do this. The gist of the method is to include the assembly code you want to execute, in this case the command to spawn a shell, in the string you use to overflow the buffer. You then overwrite the return address of the stack frame with the address of the buffer itself. The entire elegant exploit is contained within the string. The article also explains ways to improve our chances of actually executing the code, such as padding the string with NOP commands. Below is an illustration of the process:
+
+##### Stack frame during normal execution
+
+![Buffer overwrite resulting in seg fault](https://github.com/leonjunwei/maliCious/blob/master/pictures/original.png)
+
+##### Stack frame after careful buffer overflow
+
+![Buffer overwrite resulting in seg fault](https://github.com/leonjunwei/maliCious/blob/master/pictures/overwritten.png)
 
 We experimented a number of different exploit files, but they all work on the same concept: they create a shell script of a user-input length (padded with NOP commands) and save it to an environment variable called EGG. Theoretically, passing EGG as input to a vulnerable program will overflow a buffer. If EGG is the correct length, we then overwrite the return address of that stack frame and point back toward our shell script, which executes arbitrary code.
 
